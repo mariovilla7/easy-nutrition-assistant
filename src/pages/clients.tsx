@@ -81,7 +81,6 @@ const ClientsPage = () => {
     toast({
       description: "Opening client profile...",
     });
-    // In a real app, this would navigate to a client profile page
     navigate(`/clients/${id}`);
   };
 
@@ -105,7 +104,7 @@ const ClientsPage = () => {
       <main className="container px-4 pb-12 pt-6 md:px-6">
         <AnimatedTransition>
           <header className="mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-semibold md:text-3xl">Clients</h1>
                 <p className="text-sm text-muted-foreground">Manage your client roster and profiles</p>
@@ -116,7 +115,7 @@ const ClientsPage = () => {
             </div>
           </header>
 
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
@@ -132,7 +131,7 @@ const ClientsPage = () => {
             </Button>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {filteredClients.map((client) => (
               <Card key={client.id}>
                 <CardHeader className="pb-2">
@@ -169,7 +168,7 @@ const ClientsPage = () => {
                       onClick={() => handleAssignMealPlan(client.id)}
                     >
                       <Utensils size={14} className="mr-1" />
-                      Assign Meal Plan
+                      Assign Plan
                     </Button>
                     <Button 
                       variant="outline" 

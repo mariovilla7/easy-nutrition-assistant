@@ -1,4 +1,6 @@
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import IconButton from "@/components/common/IconButton";
 import StatCard from "@/components/dashboard/StatCard";
@@ -19,6 +21,20 @@ import {
 } from "lucide-react";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  const handleNewClient = () => {
+    navigate("/clients");
+  };
+
+  const handleViewCalendar = () => {
+    navigate("/calendar");
+  };
+
+  const handleScheduleSession = () => {
+    navigate("/calendar");
+  };
+
   return (
     <div className="min-h-screen bg-muted/20">
       <Navbar />
@@ -26,17 +42,17 @@ const Dashboard = () => {
       <main className="container px-4 pb-12 pt-6 md:px-6">
         <AnimatedTransition>
           <header className="mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Welcome back</p>
                 <h1 className="text-2xl font-semibold md:text-3xl">Dashboard</h1>
               </div>
               <div className="flex items-center gap-3">
-                <Button variant="outline" size="sm" className="hidden md:flex">
+                <Button variant="outline" size="sm" className="flex" onClick={handleViewCalendar}>
                   <Calendar size={16} className="mr-2" />
                   Schedule
                 </Button>
-                <Button size="sm">
+                <Button size="sm" onClick={handleNewClient}>
                   <Plus size={16} className="mr-2" />
                   New Client
                 </Button>
@@ -44,7 +60,7 @@ const Dashboard = () => {
             </div>
           </header>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total Clients"
               value="128"
@@ -85,7 +101,7 @@ const Dashboard = () => {
               defaultTab="overview"
             >
               <TabView.Content tabId="overview">
-                <div className="mt-6 grid gap-6 lg:grid-cols-5">
+                <div className="mt-6 grid gap-6 grid-cols-1 lg:grid-cols-5">
                   <div className="lg:col-span-2">
                     <ClientList />
                   </div>
@@ -95,19 +111,19 @@ const Dashboard = () => {
                 </div>
 
                 <div className="mt-6 rounded-xl border bg-white p-5 shadow-sm">
-                  <div className="mb-5 flex items-center justify-between">
+                  <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Clock size={18} className="text-primary" />
                       <h3 className="font-medium">Upcoming Sessions</h3>
                     </div>
-                    <Button variant="ghost" size="sm" className="text-xs">
+                    <Button variant="ghost" size="sm" className="text-xs" onClick={handleViewCalendar}>
                       View Calendar
                     </Button>
                   </div>
 
                   <div className="rounded-lg border bg-muted/30 p-8 text-center">
                     <p className="text-muted-foreground">No upcoming sessions scheduled for today</p>
-                    <Button variant="outline" size="sm" className="mt-3">
+                    <Button variant="outline" size="sm" className="mt-3" onClick={handleScheduleSession}>
                       <Calendar size={16} className="mr-2" />
                       Schedule a Session
                     </Button>
