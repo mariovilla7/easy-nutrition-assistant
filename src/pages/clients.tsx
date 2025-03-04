@@ -1,14 +1,41 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import AnimatedTransition from "@/components/layout/AnimatedTransition";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, Utensils } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 const ClientsPage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleAddClient = () => {
+    toast({
+      description: "Opening client creation form...",
+    });
+    // In a real app, this would navigate to a client creation form
+  };
+
+  const handleViewProfile = (id: number) => {
+    toast({
+      description: "Opening client profile...",
+    });
+    // In a real app, this would navigate to a client profile page
+  };
+
+  const handleAssignMealPlan = (id: number) => {
+    navigate(`/meal-plans/new/assign`);
+    toast({
+      description: "Choose a meal plan to assign...",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-muted/20">
       <Navbar />
@@ -22,7 +49,7 @@ const ClientsPage = () => {
                 <p className="text-sm text-muted-foreground">Manage your client roster and profiles</p>
               </div>
               <div className="flex items-center gap-3">
-                <Button size="sm">
+                <Button size="sm" onClick={handleAddClient}>
                   <Plus size={16} className="mr-2" />
                   Add Client
                 </Button>
@@ -35,7 +62,9 @@ const ClientsPage = () => {
               <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
                 placeholder="Search clients..." 
-                className="pl-8" 
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <Button variant="outline" size="sm">
@@ -78,8 +107,22 @@ const ClientsPage = () => {
                     <p className="text-muted-foreground">Plan:</p>
                     <p>{idx % 2 === 0 ? "Weight Loss Plan" : idx % 3 === 0 ? "Muscle Gain Plan" : "Balanced Diet Plan"}</p>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button variant="outline" size="sm">View Profile</Button>
+                  <div className="mt-4 flex flex-wrap gap-2 justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleAssignMealPlan(idx)}
+                    >
+                      <Utensils size={14} className="mr-1" />
+                      Assign Meal Plan
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewProfile(idx)}
+                    >
+                      View Profile
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
