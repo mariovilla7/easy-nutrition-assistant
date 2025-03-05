@@ -28,11 +28,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "./ThemeProvider";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const { theme, setTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleTheme = () => {

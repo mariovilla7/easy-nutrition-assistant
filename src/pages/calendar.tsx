@@ -1,37 +1,95 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import AnimatedTransition from "@/components/layout/AnimatedTransition";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { 
+  Calendar as CalendarIcon, 
+  ChevronLeft, 
+  ChevronRight, 
+  Plus,
+  ArrowLeft,
+  ArrowRight 
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { format, addDays, isSameDay, startOfWeek, addWeeks, subWeeks, getDay } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const CalendarPage = () => {
-  const today = new Date();
-  const currentMonth = today.toLocaleString('default', { month: 'long' });
-  const currentYear = today.getFullYear();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [weekStart, setWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 0 }));
   
   // Dummy events for the demo
   const events = [
     { 
-      date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+      id: 1,
+      date: addDays(new Date(), 1),
       title: "Jane Doe - Initial Consultation",
-      time: "10:00 AM - 11:00 AM"
+      time: "10:00 AM - 11:00 AM",
+      client: "Jane Doe",
+      type: "consultation"
     },
     { 
-      date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3),
+      id: 2,
+      date: addDays(new Date(), 3),
       title: "Alex Smith - Progress Review",
-      time: "2:30 PM - 3:15 PM"
+      time: "2:30 PM - 3:15 PM",
+      client: "Alex Smith",
+      type: "review"
     },
     { 
-      date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
+      id: 3,
+      date: addDays(new Date(), 5),
       title: "Maria Kim - Meal Plan Adjustment",
-      time: "11:30 AM - 12:15 PM"
+      time: "11:30 AM - 12:15 PM",
+      client: "Maria Kim",
+      type: "adjustment"
+    },
+    { 
+      id: 4,
+      date: addDays(new Date(), 2),
+      title: "John Davis - Follow-up Session",
+      time: "9:00 AM - 9:45 AM",
+      client: "John Davis",
+      type: "follow-up"
     }
   ];
 
+  const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  
+  const eventsForDate = (date: Date) => {
+    return events.filter(event => isSameDay(event.date, date));
+  };
+
+  const navigateToToday = () => {
+    const today = new Date();
+    setSelectedDate(today);
+    setWeekStart(startOfWeek(today, { weekStartsOn: 0 }));
+  };
+
+  const navigateWeek = (direction: 'next' | 'prev') => {
+    setWeekStart(prevWeekStart => 
+      direction === 'next' 
+        ? addWeeks(prevWeekStart, 1) 
+        : subWeeks(prevWeekStart, 1)
+    );
+  };
+
+  const getEventTypeColor = (type: string) => {
+    switch(type) {
+      case 'consultation': return 'border-l-primary';
+      case 'review': return 'border-l-secondary';
+      case 'adjustment': return 'border-l-accent';
+      case 'follow-up': return 'border-l-purple-500';
+      default: return 'border-l-gray-400';
+    }
+  };
+
+  const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
+
   return (
-    <div className="min-h-screen bg-muted/20">
+    <div className="min-h-screen bg-muted/20 dark:bg-background">
       <Navbar />
       
       <main className="container px-4 pb-12 pt-6 md:px-6">
@@ -43,7 +101,7 @@ const CalendarPage = () => {
                 <p className="text-sm text-muted-foreground">Manage your schedule and appointments</p>
               </div>
               <div className="flex items-center gap-3">
-                <Button size="sm">
+                <Button size="sm" onClick={() => {}}>
                   <Plus size={16} className="mr-2" />
                   New Appointment
                 </Button>
@@ -51,64 +109,133 @@ const CalendarPage = () => {
             </div>
           </header>
 
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CalendarIcon size={18} className="text-primary" />
-              <h2 className="text-xl font-medium">{currentMonth} {currentYear}</h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <ChevronLeft size={16} />
-              </Button>
-              <Button variant="outline" size="sm">
-                Today
-              </Button>
-              <Button variant="outline" size="sm">
-                <ChevronRight size={16} />
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid gap-6">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="grid grid-cols-7 border-b">
-                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                    <div key={day} className="border-r p-3 text-center text-sm font-medium last:border-r-0">
-                      {day}
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="grid h-[600px] grid-cols-7">
-                  {Array.from({ length: 35 }).map((_, idx) => {
-                    const isToday = idx === 15; // Arbitrary position for today
-                    const hasEvent = [16, 18, 20].includes(idx); // Positions with events
-                    
-                    return (
-                      <div 
-                        key={idx}
-                        className={`min-h-[120px] border-b border-r p-1 last:border-r-0 
-                          ${isToday ? "bg-primary/5" : ""}`}
-                      >
-                        <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs
-                          ${isToday ? "bg-primary text-primary-foreground" : ""}`}>
-                          {((idx % 31) + 1)}
-                        </div>
-                        
-                        {hasEvent && (
-                          <div className="mt-1 cursor-pointer rounded bg-primary/10 p-1 text-xs hover:bg-primary/20">
-                            <p className="font-medium text-primary">
-                              {idx === 16 ? "10:00 Jane Doe" : idx === 18 ? "14:30 Alex Smith" : "11:30 Maria Kim"}
-                            </p>
-                          </div>
-                        )}
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-[300px_1fr]">
+            <div>
+              <Card>
+                <CardContent className="p-4">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => date && setSelectedDate(date)}
+                    className="rounded-md border"
+                  />
+                  
+                  <div className="mt-6 space-y-2">
+                    <h3 className="text-sm font-medium">Upcoming Events</h3>
+                    {events.slice(0, 3).map(event => (
+                      <div key={event.id} className="text-xs p-2 rounded-md border bg-muted/30">
+                        <p className="font-semibold">{format(event.date, 'MMM dd')} - {event.time}</p>
+                        <p>{event.title}</p>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CalendarIcon size={18} className="text-primary" />
+                  <h2 className="text-xl font-medium">
+                    {format(weekStart, "MMMM d")} - {format(addDays(weekStart, 6), "MMMM d, yyyy")}
+                  </h2>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => navigateWeek('prev')}>
+                    <ChevronLeft size={16} />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={navigateToToday}>
+                    Today
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => navigateWeek('next')}>
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              </div>
+
+              <Card className="overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Days header */}
+                  <div className="grid grid-cols-7 border-b">
+                    {daysOfWeek.map((day, idx) => {
+                      const isToday = isSameDay(day, new Date());
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`border-r p-3 text-center last:border-r-0 ${
+                            isToday ? 'bg-primary/10 font-medium' : ''
+                          }`}
+                        >
+                          <p className="text-sm font-medium">
+                            {format(day, "EEE")}
+                          </p>
+                          <p className={`text-lg mt-1 ${isToday ? 'text-primary font-bold' : ''}`}>
+                            {format(day, "d")}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Schedule grid */}
+                  <div className="relative">
+                    {/* Time labels */}
+                    <div className="absolute top-0 left-0 w-16 h-full border-r">
+                      {hours.map((hour) => (
+                        <div key={hour} className="h-20 border-b px-2 text-right">
+                          <span className="text-xs text-muted-foreground">
+                            {hour > 12 ? hour - 12 : hour} {hour >= 12 ? 'PM' : 'AM'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Schedule content */}
+                    <div className="ml-16 overflow-auto">
+                      <div className="grid grid-cols-7 relative">
+                        {/* Hour lines */}
+                        {hours.map((hour) => (
+                          <div key={hour} className="col-span-7 h-20 border-b grid grid-cols-7">
+                            {Array.from({ length: 7 }).map((_, dayIdx) => (
+                              <div key={dayIdx} className="border-r last:border-r-0"></div>
+                            ))}
+                          </div>
+                        ))}
+                        
+                        {/* Events */}
+                        {daysOfWeek.map((day, dayIdx) => {
+                          const dayEvents = eventsForDate(day);
+                          return dayEvents.map((event) => {
+                            // Calculate position based on time (simplified)
+                            const hours = parseInt(event.time.split(':')[0]);
+                            const minutes = parseInt(event.time.split(':')[1]);
+                            const top = (hours - 8) * 80 + (minutes / 60) * 80;
+                            const height = 70; // fixed height for simplicity
+                            
+                            return (
+                              <div 
+                                key={event.id}
+                                className={`absolute rounded-md p-2 bg-white dark:bg-muted border ${getEventTypeColor(event.type)} border-l-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow`}
+                                style={{ 
+                                  top: `${top}px`, 
+                                  height: `${height}px`,
+                                  left: `calc(${dayIdx / 7 * 100}% + 16px)`, 
+                                  width: `calc(${1/7 * 100}% - 8px)`,
+                                }}
+                              >
+                                <p className="text-xs font-medium truncate">{event.time}</p>
+                                <p className="text-xs truncate">{event.client}</p>
+                              </div>
+                            );
+                          });
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </AnimatedTransition>
       </main>
