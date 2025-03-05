@@ -1,15 +1,61 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import AnimatedTransition from "@/components/layout/AnimatedTransition";
 import { Button } from "@/components/ui/button";
-import { PenSquare, Search } from "lucide-react";
+import { PenSquare, Search, Send, User, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const MessagesPage = () => {
+  const { toast } = useToast();
+  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [currentMessage, setCurrentMessage] = useState("");
+
+  // Mock clients for message creation
+  const clients = [
+    { id: "1", name: "Sarah Johnson", avatar: "https://i.pravatar.cc/100?img=1" },
+    { id: "2", name: "Alex Smith", avatar: "https://i.pravatar.cc/100?img=2" },
+    { id: "3", name: "Maria Kim", avatar: "https://i.pravatar.cc/100?img=3" },
+    { id: "4", name: "John Miller", avatar: "https://i.pravatar.cc/100?img=4" },
+    { id: "5", name: "Sarah Wilson", avatar: "https://i.pravatar.cc/100?img=5" }
+  ];
+
+  const handleSendMessage = () => {
+    if (currentMessage.trim()) {
+      // In a real app, you would send the message to the server
+      setCurrentMessage("");
+      toast({
+        description: "Message sent",
+      });
+    }
+  };
+
+  const handleCreateNewMessage = () => {
+    setShowNewMessageDialog(true);
+  };
+
+  const handleSubmitNewMessage = () => {
+    if (selectedClient && messageText.trim()) {
+      setShowNewMessageDialog(false);
+      toast({
+        title: "Message Created",
+        description: "Your message has been sent to the client",
+      });
+      setSelectedClient("");
+      setMessageText("");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-muted/20">
       <Navbar />
@@ -23,7 +69,7 @@ const MessagesPage = () => {
                 <p className="text-sm text-muted-foreground">Communicate with your clients</p>
               </div>
               <div className="flex items-center gap-3">
-                <Button size="sm">
+                <Button size="sm" onClick={handleCreateNewMessage}>
                   <PenSquare size={16} className="mr-2" />
                   New Message
                 </Button>
@@ -107,12 +153,81 @@ const MessagesPage = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Input placeholder="Type a message..." className="flex-1" />
-                  <Button>Send</Button>
+                  <Input 
+                    placeholder="Type a message..." 
+                    className="flex-1" 
+                    value={currentMessage}
+                    onChange={(e) => setCurrentMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                  />
+                  <Button onClick={handleSendMessage}>
+                    <Send size={16} className="mr-2" />
+                    Send
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          <Dialog open={showNewMessageDialog} onOpenChange={setShowNewMessageDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>New Message</DialogTitle>
+                <DialogDescription>
+                  Start a new conversation with a client
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="client">Recipient</Label>
+                  <Select 
+                    value={selectedClient}
+                    onValueChange={setSelectedClient}
+                  >
+                    <SelectTrigger id="client">
+                      <SelectValue placeholder="Select a client" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clients.map(client => (
+                        <SelectItem key={client.id} value={client.id}>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={client.avatar} />
+                              <AvatarFallback>{client.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                            </Avatar>
+                            {client.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea 
+                    id="message" 
+                    placeholder="Type your message here..." 
+                    rows={4}
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowNewMessageDialog(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmitNewMessage}>
+                  Send Message
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </AnimatedTransition>
       </main>
     </div>

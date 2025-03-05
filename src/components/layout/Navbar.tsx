@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock notification data
 const notifications = [
@@ -72,18 +73,37 @@ const notifications = [
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [notificationsList, setNotificationsList] = useState(notifications);
   const [unreadNotifications, setUnreadNotifications] = useState(
     notifications.filter(n => !n.read).length
   );
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
   const markAllAsRead = () => {
+    const updatedNotifications = notificationsList.map(notification => ({
+      ...notification,
+      read: true
+    }));
+    setNotificationsList(updatedNotifications);
     setUnreadNotifications(0);
+    toast({
+      description: "All notifications marked as read",
+    });
+  };
+
+  const viewAllNotifications = () => {
+    setIsNotificationOpen(false);
+    toast({
+      description: "Viewing all notifications",
+    });
+    // In a real app, you would navigate to a notifications page
   };
 
   const navItems = [
@@ -149,7 +169,10 @@ const Navbar = () => {
               aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             />
             
-            <Popover>
+            <Popover 
+              open={isNotificationOpen} 
+              onOpenChange={setIsNotificationOpen}
+            >
               <PopoverTrigger asChild>
                 <div className="relative">
                   <IconButton
@@ -176,7 +199,7 @@ const Navbar = () => {
                 </div>
                 <ScrollArea className="h-[300px]">
                   <div className="divide-y">
-                    {notifications.map((notification) => (
+                    {notificationsList.map((notification) => (
                       <div 
                         key={notification.id} 
                         className={`p-3 hover:bg-muted/50 dark:hover:bg-muted/10 transition-colors ${
@@ -196,7 +219,7 @@ const Navbar = () => {
                   </div>
                 </ScrollArea>
                 <div className="p-3 border-t">
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" size="sm" className="w-full" onClick={viewAllNotifications}>
                     View all notifications
                   </Button>
                 </div>

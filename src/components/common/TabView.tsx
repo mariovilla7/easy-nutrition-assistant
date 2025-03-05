@@ -37,7 +37,7 @@ const TabView = ({ tabs, children, defaultTab, className, onTabChange }: TabView
             className={cn(
               "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-ring",
               activeTab === tab.id
-                ? "bg-white text-foreground shadow-sm dark:bg-muted dark:text-white"
+                ? "bg-white text-foreground shadow-sm dark:bg-primary/20 dark:text-white"
                 : "text-muted-foreground hover:bg-white/50 hover:text-foreground dark:hover:bg-muted/50"
             )}
           >

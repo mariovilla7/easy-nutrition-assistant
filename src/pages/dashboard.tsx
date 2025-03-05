@@ -27,10 +27,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format, addDays } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showReminderDialog, setShowReminderDialog] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
+
+  // Mock clients for demonstration
+  const clients = [
+    { id: "1", name: "Sarah Johnson" },
+    { id: "2", name: "Michael Chen" },
+    { id: "3", name: "Jessica Park" },
+    { id: "4", name: "David Rodriguez" },
+  ];
 
   const handleNewClient = () => {
     navigate("/clients");
@@ -56,6 +73,42 @@ const Dashboard = () => {
     navigate("/meal-plans");
   };
 
+  const scheduleNewPayment = () => {
+    setShowPaymentDialog(true);
+  };
+
+  const sendPaymentReminder = () => {
+    setShowReminderDialog(true);
+  };
+
+  const viewPaymentHistory = () => {
+    navigate("/clients");
+    toast({
+      title: "Payment History",
+      description: "Navigating to client payment history",
+    });
+  };
+
+  const handleAddPayment = () => {
+    setShowPaymentDialog(true);
+  };
+
+  const handleSubmitPayment = () => {
+    setShowPaymentDialog(false);
+    toast({
+      title: "Payment Scheduled",
+      description: "The payment has been scheduled successfully",
+    });
+  };
+
+  const handleSubmitReminder = () => {
+    setShowReminderDialog(false);
+    toast({
+      title: "Reminder Sent",
+      description: "Payment reminder has been sent to the client",
+    });
+  };
+  
   // Mock payment schedules
   const paymentSchedules = [
     {
@@ -182,15 +235,27 @@ const Dashboard = () => {
                       <CardDescription>Manage client payments</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <Button className="w-full flex items-center justify-start" variant="outline">
+                      <Button 
+                        className="w-full flex items-center justify-start" 
+                        variant="outline"
+                        onClick={scheduleNewPayment}
+                      >
                         <CreditCard className="mr-2" size={18} />
                         Schedule New Payment
                       </Button>
-                      <Button className="w-full flex items-center justify-start" variant="outline">
+                      <Button 
+                        className="w-full flex items-center justify-start" 
+                        variant="outline"
+                        onClick={sendPaymentReminder}
+                      >
                         <Bell className="mr-2" size={18} />
                         Send Payment Reminder
                       </Button>
-                      <Button className="w-full flex items-center justify-start" variant="outline">
+                      <Button 
+                        className="w-full flex items-center justify-start" 
+                        variant="outline"
+                        onClick={viewPaymentHistory}
+                      >
                         <Wallet className="mr-2" size={18} />
                         View Payment History
                       </Button>
@@ -203,7 +268,7 @@ const Dashboard = () => {
                         <CardTitle className="text-lg">Payment Schedule</CardTitle>
                         <CardDescription>Upcoming client payments</CardDescription>
                       </div>
-                      <Button size="sm">
+                      <Button size="sm" onClick={handleAddPayment}>
                         <Plus size={16} className="mr-2" />
                         Add Payment
                       </Button>
@@ -234,7 +299,7 @@ const Dashboard = () => {
                           ) : (
                             <div className="rounded-lg border bg-muted/30 dark:bg-muted/10 p-8 text-center">
                               <p className="text-muted-foreground">No payment schedules created yet</p>
-                              <Button variant="outline" size="sm" className="mt-3">
+                              <Button variant="outline" size="sm" className="mt-3" onClick={handleAddPayment}>
                                 <Plus size={16} className="mr-2" />
                                 Create Payment Schedule
                               </Button>
@@ -246,39 +311,99 @@ const Dashboard = () => {
                   </Card>
                 </div>
 
-                <Card className="mt-6">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <div>
-                      <CardTitle className="text-lg">Client Billing Overview</CardTitle>
-                      <CardDescription>Manage all your client payments</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="rounded-lg border p-4 bg-muted/30 dark:bg-muted/10">
-                          <p className="text-muted-foreground text-sm">Upcoming Payments</p>
-                          <p className="text-2xl font-semibold mt-1">$270.00</p>
-                        </div>
-                        <div className="rounded-lg border p-4 bg-muted/30 dark:bg-muted/10">
-                          <p className="text-muted-foreground text-sm">Overdue Payments</p>
-                          <p className="text-2xl font-semibold mt-1">$120.00</p>
-                        </div>
-                        <div className="rounded-lg border p-4 bg-muted/30 dark:bg-muted/10">
-                          <p className="text-muted-foreground text-sm">Total This Month</p>
-                          <p className="text-2xl font-semibold mt-1">$1,450.00</p>
-                        </div>
+                <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Schedule New Payment</DialogTitle>
+                      <DialogDescription>
+                        Create a new payment for a client
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="client">Client</Label>
+                        <Select 
+                          value={selectedClient}
+                          onValueChange={setSelectedClient}
+                        >
+                          <SelectTrigger id="client">
+                            <SelectValue placeholder="Select a client" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {clients.map(client => (
+                              <SelectItem key={client.id} value={client.id}>
+                                {client.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="amount">Amount</Label>
+                        <Input id="amount" type="number" placeholder="0.00" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="dueDate">Due Date</Label>
+                        <Input id="dueDate" type="date" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="description">Description (Optional)</Label>
+                        <Input id="description" placeholder="Monthly nutrition session" />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSubmitPayment}>
+                        Schedule Payment
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
 
-                      <div className="pt-4">
-                        <Button onClick={() => navigate("/clients")}>
-                          <Users size={16} className="mr-2" />
-                          Manage Client Billing
-                        </Button>
+                <Dialog open={showReminderDialog} onOpenChange={setShowReminderDialog}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Send Payment Reminder</DialogTitle>
+                      <DialogDescription>
+                        Send a reminder about an upcoming or overdue payment
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="reminderClient">Client</Label>
+                        <Select 
+                          value={selectedClient}
+                          onValueChange={setSelectedClient}
+                        >
+                          <SelectTrigger id="reminderClient">
+                            <SelectValue placeholder="Select a client" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {clients.map(client => (
+                              <SelectItem key={client.id} value={client.id}>
+                                {client.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="reminderMessage">Reminder Message</Label>
+                        <Input id="reminderMessage" placeholder="Friendly reminder about your upcoming payment" />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowReminderDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSubmitReminder}>
+                        Send Reminder
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </TabView.Content>
 
               <TabView.Content tabId="tasks">
