@@ -15,15 +15,18 @@ import {
   Clock, 
   CreditCard, 
   DollarSign,
-  Gift, 
+  MessageSquare,
   Plus, 
   Utensils, 
   Users, 
   Wallet,
-  MessageSquare
+  Bell,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { format, addDays } from "date-fns";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -53,13 +56,29 @@ const Dashboard = () => {
     navigate("/meal-plans");
   };
 
-  // Mock financial data
-  const financialData = [
-    { id: 1, client: "Sarah Johnson", date: "Yesterday", amount: 120, status: "Paid" },
-    { id: 2, client: "Michael Chen", date: "Sep 15, 2023", amount: 150, status: "Paid" },
-    { id: 3, client: "Jessica Park", date: "Sep 14, 2023", amount: 120, status: "Pending" },
-    { id: 4, client: "David Rodriguez", date: "Sep 10, 2023", amount: 200, status: "Paid" },
-    { id: 5, client: "Emma Wilson", date: "Sep 5, 2023", amount: 180, status: "Overdue" },
+  // Mock payment schedules
+  const paymentSchedules = [
+    {
+      id: 1,
+      clientName: "Sarah Johnson",
+      amount: 120,
+      dueDate: addDays(new Date(), 3),
+      status: "Upcoming"
+    },
+    {
+      id: 2,
+      clientName: "Michael Chen",
+      amount: 150,
+      dueDate: addDays(new Date(), 7),
+      status: "Upcoming"
+    },
+    {
+      id: 3,
+      clientName: "Jessica Park",
+      amount: 120,
+      dueDate: addDays(new Date(), -2),
+      status: "Overdue"
+    }
   ];
 
   return (
@@ -87,7 +106,7 @@ const Dashboard = () => {
             </div>
           </header>
 
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <StatCard
               title="Total Clients"
               value="128"
@@ -111,14 +130,6 @@ const Dashboard = () => {
               trend={{ value: 5, label: "from yesterday", positive: true }}
               variant="default"
               linkTo="/messages"
-            />
-            <StatCard
-              title="Monthly Revenue"
-              value="$6,400"
-              icon={DollarSign}
-              trend={{ value: 3, label: "from last month", positive: false }}
-              variant="primary"
-              linkTo="#finance"
             />
           </div>
 
@@ -173,11 +184,11 @@ const Dashboard = () => {
                     <CardContent className="space-y-3">
                       <Button className="w-full flex items-center justify-start" variant="outline">
                         <CreditCard className="mr-2" size={18} />
-                        Schedule Payment
+                        Schedule New Payment
                       </Button>
                       <Button className="w-full flex items-center justify-start" variant="outline">
-                        <DollarSign className="mr-2" size={18} />
-                        Record Manual Payment
+                        <Bell className="mr-2" size={18} />
+                        Send Payment Reminder
                       </Button>
                       <Button className="w-full flex items-center justify-start" variant="outline">
                         <Wallet className="mr-2" size={18} />
@@ -187,34 +198,48 @@ const Dashboard = () => {
                   </Card>
 
                   <Card className="md:col-span-2">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Recent Transactions</CardTitle>
-                      <CardDescription>Your latest payment activities</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <div>
+                        <CardTitle className="text-lg">Payment Schedule</CardTitle>
+                        <CardDescription>Upcoming client payments</CardDescription>
+                      </div>
+                      <Button size="sm">
+                        <Plus size={16} className="mr-2" />
+                        Add Payment
+                      </Button>
                     </CardHeader>
                     <CardContent>
                       <ScrollArea className="h-[300px] pr-4">
                         <div className="space-y-3">
-                          {financialData.map((transaction) => (
-                            <div key={transaction.id} 
-                              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 dark:hover:bg-muted/10 transition-colors">
-                              <div>
-                                <p className="font-medium">{transaction.client}</p>
-                                <p className="text-sm text-muted-foreground">{transaction.date}</p>
+                          {paymentSchedules.length > 0 ? (
+                            paymentSchedules.map((payment) => (
+                              <div key={payment.id} 
+                                className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 dark:hover:bg-muted/10 transition-colors">
+                                <div>
+                                  <p className="font-medium">{payment.clientName}</p>
+                                  <p className="text-sm text-muted-foreground">Due: {format(payment.dueDate, 'MMM dd, yyyy')}</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <p className="font-medium">${payment.amount}</p>
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    payment.status === "Upcoming" 
+                                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" 
+                                      : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                  }`}>
+                                    {payment.status}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-3">
-                                <p className="font-medium">${transaction.amount}</p>
-                                <span className={`text-xs px-2 py-1 rounded-full ${
-                                  transaction.status === "Paid" 
-                                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" 
-                                    : transaction.status === "Pending" 
-                                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                                }`}>
-                                  {transaction.status}
-                                </span>
-                              </div>
+                            ))
+                          ) : (
+                            <div className="rounded-lg border bg-muted/30 dark:bg-muted/10 p-8 text-center">
+                              <p className="text-muted-foreground">No payment schedules created yet</p>
+                              <Button variant="outline" size="sm" className="mt-3">
+                                <Plus size={16} className="mr-2" />
+                                Create Payment Schedule
+                              </Button>
                             </div>
-                          ))}
+                          )}
                         </div>
                       </ScrollArea>
                     </CardContent>
@@ -222,17 +247,35 @@ const Dashboard = () => {
                 </div>
 
                 <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Payment Schedule</CardTitle>
-                    <CardDescription>Upcoming client payments</CardDescription>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <div>
+                      <CardTitle className="text-lg">Client Billing Overview</CardTitle>
+                      <CardDescription>Manage all your client payments</CardDescription>
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="rounded-lg border bg-muted/30 dark:bg-muted/10 p-8 text-center">
-                      <p className="text-muted-foreground">No payment schedules created yet</p>
-                      <Button variant="outline" size="sm" className="mt-3">
-                        <Plus size={16} className="mr-2" />
-                        Create Payment Schedule
-                      </Button>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="rounded-lg border p-4 bg-muted/30 dark:bg-muted/10">
+                          <p className="text-muted-foreground text-sm">Upcoming Payments</p>
+                          <p className="text-2xl font-semibold mt-1">$270.00</p>
+                        </div>
+                        <div className="rounded-lg border p-4 bg-muted/30 dark:bg-muted/10">
+                          <p className="text-muted-foreground text-sm">Overdue Payments</p>
+                          <p className="text-2xl font-semibold mt-1">$120.00</p>
+                        </div>
+                        <div className="rounded-lg border p-4 bg-muted/30 dark:bg-muted/10">
+                          <p className="text-muted-foreground text-sm">Total This Month</p>
+                          <p className="text-2xl font-semibold mt-1">$1,450.00</p>
+                        </div>
+                      </div>
+
+                      <div className="pt-4">
+                        <Button onClick={() => navigate("/clients")}>
+                          <Users size={16} className="mr-2" />
+                          Manage Client Billing
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

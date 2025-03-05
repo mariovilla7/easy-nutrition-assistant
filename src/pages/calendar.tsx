@@ -8,20 +8,57 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Plus,
-  ArrowLeft,
-  ArrowRight 
+  Clock,
+  User,
+  X
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { format, addDays, isSameDay, startOfWeek, addWeeks, subWeeks, getDay } from "date-fns";
+import { format, addDays, isSameDay, startOfWeek, addWeeks, subWeeks } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+// Mock clients for the demo
+const mockClients = [
+  { id: "1", name: "Sarah Johnson" },
+  { id: "2", name: "Michael Chen" },
+  { id: "3", name: "Jessica Park" },
+  { id: "4", name: "David Rodriguez" },
+  { id: "5", name: "Emma Wilson" },
+  { id: "6", name: "Marcus Lee" }
+];
 
 const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [weekStart, setWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 0 }));
+  const [showSessionDialog, setShowSessionDialog] = useState(false);
+  const [sessionDetails, setSessionDetails] = useState({
+    clientId: "",
+    title: "",
+    date: new Date(),
+    time: "10:00",
+    duration: "30"
+  });
   
   // Dummy events for the demo
-  const events = [
+  const [events, setEvents] = useState([
     { 
       id: 1,
       date: addDays(new Date(), 1),
@@ -54,7 +91,7 @@ const CalendarPage = () => {
       client: "John Davis",
       type: "follow-up"
     }
-  ];
+  ]);
 
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
@@ -86,6 +123,49 @@ const CalendarPage = () => {
     }
   };
 
+  const handleCreateSession = () => {
+    setShowSessionDialog(true);
+    setSessionDetails({
+      ...sessionDetails,
+      date: selectedDate
+    });
+  };
+
+  const handleSaveSession = () => {
+    if (!sessionDetails.clientId) return;
+    
+    const client = mockClients.find(c => c.id === sessionDetails.clientId);
+    if (!client) return;
+    
+    // Create time string (simple for demo)
+    const timeFormatted = `${sessionDetails.time} - ${getEndTime(sessionDetails.time, parseInt(sessionDetails.duration))}`;
+    
+    // Create new event
+    const newEvent = {
+      id: events.length + 1,
+      date: sessionDetails.date,
+      title: sessionDetails.title || `${client.name} - Nutrition Session`,
+      time: timeFormatted,
+      client: client.name,
+      type: "consultation"
+    };
+    
+    setEvents([...events, newEvent]);
+    setShowSessionDialog(false);
+  };
+
+  const getEndTime = (startTime: string, durationMinutes: number) => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    let endHours = hours + Math.floor((minutes + durationMinutes) / 60);
+    const endMinutes = (minutes + durationMinutes) % 60;
+    const period = endHours >= 12 ? 'PM' : 'AM';
+    
+    if (endHours > 12) endHours -= 12;
+    if (endHours === 0) endHours = 12;
+    
+    return `${endHours}:${endMinutes.toString().padStart(2, '0')} ${period}`;
+  };
+
   const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
 
   return (
@@ -101,7 +181,7 @@ const CalendarPage = () => {
                 <p className="text-sm text-muted-foreground">Manage your schedule and appointments</p>
               </div>
               <div className="flex items-center gap-3">
-                <Button size="sm" onClick={() => {}}>
+                <Button size="sm" onClick={handleCreateSession}>
                   <Plus size={16} className="mr-2" />
                   New Appointment
                 </Button>
@@ -123,7 +203,7 @@ const CalendarPage = () => {
                   <div className="mt-6 space-y-2">
                     <h3 className="text-sm font-medium">Upcoming Events</h3>
                     {events.slice(0, 3).map(event => (
-                      <div key={event.id} className="text-xs p-2 rounded-md border bg-muted/30">
+                      <div key={event.id} className="text-xs p-2 rounded-md border bg-muted/30 dark:bg-muted/10">
                         <p className="font-semibold">{format(event.date, 'MMM dd')} - {event.time}</p>
                         <p>{event.title}</p>
                       </div>
@@ -239,6 +319,106 @@ const CalendarPage = () => {
           </div>
         </AnimatedTransition>
       </main>
+
+      {/* Session Creation Dialog */}
+      <Dialog open={showSessionDialog} onOpenChange={setShowSessionDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Session</DialogTitle>
+            <DialogDescription>
+              Schedule a session with a client
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="client" className="text-right">
+                Client
+              </Label>
+              <div className="col-span-3">
+                <Select 
+                  value={sessionDetails.clientId} 
+                  onValueChange={(value) => setSessionDetails({...sessionDetails, clientId: value})}
+                >
+                  <SelectTrigger id="client">
+                    <SelectValue placeholder="Select a client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockClients.map(client => (
+                      <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">
+                Title
+              </Label>
+              <Input
+                id="title"
+                value={sessionDetails.title}
+                placeholder="Session title (optional)"
+                className="col-span-3"
+                onChange={(e) => setSessionDetails({...sessionDetails, title: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="date" className="text-right">
+                Date
+              </Label>
+              <div className="col-span-3">
+                <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                  {format(sessionDetails.date, 'MMMM dd, yyyy')}
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="time" className="text-right">
+                Time
+              </Label>
+              <Input
+                id="time"
+                type="time"
+                value={sessionDetails.time}
+                className="col-span-3"
+                onChange={(e) => setSessionDetails({...sessionDetails, time: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="duration" className="text-right">
+                Duration
+              </Label>
+              <Select 
+                value={sessionDetails.duration} 
+                onValueChange={(value) => setSessionDetails({...sessionDetails, duration: value})}
+              >
+                <SelectTrigger id="duration" className="col-span-3">
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="45">45 minutes</SelectItem>
+                  <SelectItem value="60">60 minutes</SelectItem>
+                  <SelectItem value="90">90 minutes</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleSaveSession} disabled={!sessionDetails.clientId}>Create Session</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
