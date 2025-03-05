@@ -29,15 +29,61 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./ThemeProvider";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+
+// Mock notification data
+const notifications = [
+  {
+    id: 1,
+    title: "New client request",
+    description: "Sarah Johnson has requested to become a client",
+    time: "10 minutes ago",
+    read: false,
+  },
+  {
+    id: 2,
+    title: "Message received",
+    description: "Michael Chen: Can we reschedule tomorrow's appointment?",
+    time: "1 hour ago",
+    read: false,
+  },
+  {
+    id: 3,
+    title: "Payment received",
+    description: "Jessica Park has completed their payment",
+    time: "3 hours ago",
+    read: true,
+  },
+  {
+    id: 4,
+    title: "Reminder",
+    description: "You have a consultation with David Rodriguez tomorrow at 2PM",
+    time: "5 hours ago",
+    read: true,
+  },
+];
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(
+    notifications.filter(n => !n.read).length
+  );
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  const markAllAsRead = () => {
+    setUnreadNotifications(0);
   };
 
   const navItems = [
@@ -103,12 +149,59 @@ const Navbar = () => {
               aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             />
             
-            <IconButton
-              icon={Bell}
-              variant="ghost"
-              size="sm"
-              aria-label="Notifications"
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <div className="relative">
+                  <IconButton
+                    icon={Bell}
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Notifications"
+                  />
+                  {unreadNotifications > 0 && (
+                    <Badge 
+                      className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center text-[10px]"
+                    >
+                      {unreadNotifications}
+                    </Badge>
+                  )}
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="end">
+                <div className="flex items-center justify-between p-3 border-b">
+                  <h3 className="font-medium">Notifications</h3>
+                  <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+                    Mark all as read
+                  </Button>
+                </div>
+                <ScrollArea className="h-[300px]">
+                  <div className="divide-y">
+                    {notifications.map((notification) => (
+                      <div 
+                        key={notification.id} 
+                        className={`p-3 hover:bg-muted/50 dark:hover:bg-muted/10 transition-colors ${
+                          !notification.read ? 'bg-muted/20 dark:bg-muted/5' : ''
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-sm">{notification.title}</h4>
+                          {!notification.read && (
+                            <Badge variant="outline" className="h-1.5 w-1.5 rounded-full p-0 bg-primary" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{notification.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+                <div className="p-3 border-t">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View all notifications
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             
             {/* Mobile Menu */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>

@@ -16,14 +16,21 @@ import MessagesPage from "./pages/messages";
 import NotFound from "./pages/NotFound";
 import CreateMenuPage from "./pages/create-menu";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider defaultTheme="system">
       <TooltipProvider>
         <Toaster />
-        <Sonner position="top-right" closeButton={true} />
+        <Sonner position="top-right" closeButton theme="system" />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Dashboard />} />

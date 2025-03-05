@@ -13,15 +13,21 @@ import {
   Calendar, 
   ChevronUp, 
   Clock, 
+  CreditCard, 
+  DollarSign,
   Gift, 
   Plus, 
   Utensils, 
   Users, 
+  Wallet,
   MessageSquare
 } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
 
   const handleNewClient = () => {
     navigate("/clients");
@@ -35,8 +41,29 @@ const Dashboard = () => {
     navigate("/calendar");
   };
 
+  const handleViewMessages = () => {
+    navigate("/messages");
+  };
+
+  const handleViewClients = () => {
+    navigate("/clients");
+  };
+
+  const handleViewMealPlans = () => {
+    navigate("/meal-plans");
+  };
+
+  // Mock financial data
+  const financialData = [
+    { id: 1, client: "Sarah Johnson", date: "Yesterday", amount: 120, status: "Paid" },
+    { id: 2, client: "Michael Chen", date: "Sep 15, 2023", amount: 150, status: "Paid" },
+    { id: 3, client: "Jessica Park", date: "Sep 14, 2023", amount: 120, status: "Pending" },
+    { id: 4, client: "David Rodriguez", date: "Sep 10, 2023", amount: 200, status: "Paid" },
+    { id: 5, client: "Emma Wilson", date: "Sep 5, 2023", amount: 180, status: "Overdue" },
+  ];
+
   return (
-    <div className="min-h-screen bg-muted/20">
+    <div className="min-h-screen bg-muted/20 dark:bg-background">
       <Navbar />
       
       <main className="container px-4 pb-12 pt-6 md:px-6">
@@ -66,28 +93,32 @@ const Dashboard = () => {
               value="128"
               icon={Users}
               trend={{ value: 12, label: "from last month", positive: true }}
-              variant="glass"
+              variant="default"
+              linkTo="/clients"
             />
             <StatCard
               title="Active Meal Plans"
               value="87"
               icon={Utensils}
               trend={{ value: 8, label: "from last month", positive: true }}
-              variant="glass"
+              variant="default"
+              linkTo="/meal-plans"
             />
             <StatCard
               title="New Messages"
               value="34"
               icon={MessageSquare}
               trend={{ value: 5, label: "from yesterday", positive: true }}
-              variant="glass"
+              variant="default"
+              linkTo="/messages"
             />
             <StatCard
-              title="This Month's Revenue"
+              title="Monthly Revenue"
               value="$6,400"
-              icon={Gift}
+              icon={DollarSign}
               trend={{ value: 3, label: "from last month", positive: false }}
               variant="primary"
+              linkTo="#finance"
             />
           </div>
 
@@ -95,10 +126,11 @@ const Dashboard = () => {
             <TabView
               tabs={[
                 { id: "overview", label: "Overview" },
-                { id: "performance", label: "Performance" },
+                { id: "finance", label: "Finance" },
                 { id: "tasks", label: "Tasks" },
               ]}
               defaultTab="overview"
+              onTabChange={setActiveTab}
             >
               <TabView.Content tabId="overview">
                 <div className="mt-6 grid gap-6 grid-cols-1 lg:grid-cols-5">
@@ -110,7 +142,7 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-xl border bg-white p-5 shadow-sm">
+                <div className="mt-6 rounded-xl border bg-card dark:bg-card/80 p-5 shadow-sm">
                   <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Clock size={18} className="text-primary" />
@@ -121,7 +153,7 @@ const Dashboard = () => {
                     </Button>
                   </div>
 
-                  <div className="rounded-lg border bg-muted/30 p-8 text-center">
+                  <div className="rounded-lg border bg-muted/30 dark:bg-muted/10 p-8 text-center">
                     <p className="text-muted-foreground">No upcoming sessions scheduled for today</p>
                     <Button variant="outline" size="sm" className="mt-3" onClick={handleScheduleSession}>
                       <Calendar size={16} className="mr-2" />
@@ -131,14 +163,83 @@ const Dashboard = () => {
                 </div>
               </TabView.Content>
 
-              <TabView.Content tabId="performance">
-                <div className="mt-6 rounded-xl border bg-white p-8 text-center shadow-sm">
-                  <p className="text-muted-foreground">Performance metrics will be available soon</p>
+              <TabView.Content tabId="finance">
+                <div className="mt-6 grid gap-6 grid-cols-1 md:grid-cols-3">
+                  <Card className="md:col-span-1">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Payment Actions</CardTitle>
+                      <CardDescription>Manage client payments</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button className="w-full flex items-center justify-start" variant="outline">
+                        <CreditCard className="mr-2" size={18} />
+                        Schedule Payment
+                      </Button>
+                      <Button className="w-full flex items-center justify-start" variant="outline">
+                        <DollarSign className="mr-2" size={18} />
+                        Record Manual Payment
+                      </Button>
+                      <Button className="w-full flex items-center justify-start" variant="outline">
+                        <Wallet className="mr-2" size={18} />
+                        View Payment History
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="md:col-span-2">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Recent Transactions</CardTitle>
+                      <CardDescription>Your latest payment activities</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-[300px] pr-4">
+                        <div className="space-y-3">
+                          {financialData.map((transaction) => (
+                            <div key={transaction.id} 
+                              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 dark:hover:bg-muted/10 transition-colors">
+                              <div>
+                                <p className="font-medium">{transaction.client}</p>
+                                <p className="text-sm text-muted-foreground">{transaction.date}</p>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <p className="font-medium">${transaction.amount}</p>
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  transaction.status === "Paid" 
+                                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" 
+                                    : transaction.status === "Pending" 
+                                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                }`}>
+                                  {transaction.status}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
                 </div>
+
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Payment Schedule</CardTitle>
+                    <CardDescription>Upcoming client payments</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="rounded-lg border bg-muted/30 dark:bg-muted/10 p-8 text-center">
+                      <p className="text-muted-foreground">No payment schedules created yet</p>
+                      <Button variant="outline" size="sm" className="mt-3">
+                        <Plus size={16} className="mr-2" />
+                        Create Payment Schedule
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabView.Content>
 
               <TabView.Content tabId="tasks">
-                <div className="mt-6 rounded-xl border bg-white p-8 text-center shadow-sm">
+                <div className="mt-6 rounded-xl border bg-card dark:bg-card/80 p-8 text-center shadow-sm">
                   <p className="text-muted-foreground">Task management will be available soon</p>
                 </div>
               </TabView.Content>
