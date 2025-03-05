@@ -13,6 +13,7 @@ import MealPlanDetailsPage from "./pages/meal-plan-details";
 import MealPlanAssignPage from "./pages/meal-plan-assign";
 import CalendarPage from "./pages/calendar";
 import MessagesPage from "./pages/messages";
+import NotificationsPage from "./pages/notifications";
 import NotFound from "./pages/NotFound";
 import CreateMenuPage from "./pages/create-menu";
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/meal-plans/create" element={<CreateMenuPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

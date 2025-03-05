@@ -3,13 +3,11 @@ import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import AnimatedTransition from "@/components/layout/AnimatedTransition";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, ShoppingCart, Copy, Brain, User } from "lucide-react";
+import { Plus, Search, ShoppingCart, Copy, Brain, User, PenLine } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import CreateMealDialog from "@/components/meal-plans/CreateMealDialog";
 import { useNavigate } from "react-router-dom";
@@ -21,21 +19,24 @@ const mealPlansData = [
     title: "Balanced Diet Plan",
     description: "General purpose nutrition plan",
     details: "A well-balanced meal plan with proper macro distribution suitable for most clients.",
-    clientCount: 12
+    clientCount: 12,
+    preferences: ["Gluten-free", "High-protein"]
   },
   {
     id: 2,
     title: "Weight Loss Plan",
     description: "Calorie deficit focused plan",
     details: "A structured meal plan designed for healthy and sustainable weight loss.",
-    clientCount: 8
+    clientCount: 8,
+    preferences: ["Low-carb", "High-fiber"]
   },
   {
     id: 3,
     title: "Muscle Gain Plan",
     description: "High protein nutrition",
     details: "Protein-rich meal plan designed for clients focused on muscle development.",
-    clientCount: 5
+    clientCount: 5,
+    preferences: ["High-protein", "Calorie surplus"]
   }
 ];
 
@@ -71,6 +72,20 @@ const MealPlansPage = () => {
     });
   };
 
+  const handleEditPlan = (id: number) => {
+    navigate(`/meal-plans/${id}`);
+    toast({
+      description: "Opening plan editor...",
+    });
+  };
+
+  const handleCreateCustomMenu = () => {
+    navigate("/meal-plans/create");
+    toast({
+      description: "Opening menu creation page...",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-muted/20">
       <Navbar />
@@ -84,9 +99,13 @@ const MealPlansPage = () => {
                 <p className="text-sm text-muted-foreground">Create and manage nutrition plans for your clients</p>
               </div>
               <div className="flex items-center gap-3">
-                <Button size="sm" onClick={handleCreateMealPlan}>
+                <Button variant="outline" size="sm" onClick={handleCreateCustomMenu}>
                   <Plus size={16} className="mr-2" />
-                  New Meal Plan
+                  Custom Menu
+                </Button>
+                <Button size="sm" onClick={handleCreateMealPlan}>
+                  <Brain size={16} className="mr-2" />
+                  AI Menu Creator
                 </Button>
               </div>
             </div>
@@ -121,6 +140,17 @@ const MealPlansPage = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">{plan.details}</p>
+                  
+                  {plan.preferences && plan.preferences.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {plan.preferences.map((pref, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {pref}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">{plan.clientCount} clients using this plan</span>
                     <div className="flex gap-2">
@@ -134,6 +164,14 @@ const MealPlansPage = () => {
                     </div>
                   </div>
                   <div className="mt-3 flex justify-end gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleEditPlan(plan.id)}
+                    >
+                      <PenLine size={14} className="mr-1" />
+                      Edit
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
