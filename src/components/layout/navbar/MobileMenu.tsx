@@ -29,7 +29,7 @@ export const MobileMenu = ({
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild className="md:hidden">
         <IconButton
-          icon={(props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>}
+          icon={LogOut}
           variant="ghost"
           size="sm"
           aria-label="Open menu"
@@ -39,9 +39,9 @@ export const MobileMenu = ({
         <div className="flex flex-col h-full py-4">
           <div className="flex items-center mb-6">
             <img 
-              src="/lovable-uploads/49b67077-b404-4160-98b3-498759f3855a.png" 
+              src="/lovable-uploads/b36875e3-2bbd-44f1-9dd7-0bd7f1f04ba7.png" 
               alt="KYA-ORA Logo" 
-              className="h-6 mr-2" 
+              className="h-8 mr-2" 
             />
             <span className="text-xl font-medium">KYA-ORA</span>
           </div>

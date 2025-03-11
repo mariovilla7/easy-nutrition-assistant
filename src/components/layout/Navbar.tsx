@@ -83,7 +83,7 @@ const Navbar = () => {
         <div className="flex items-center gap-6 lg:gap-10">
           <Link to="/" className="flex items-center gap-2 font-medium">
             <img 
-              src="/lovable-uploads/49b67077-b404-4160-98b3-498759f3855a.png" 
+              src="/lovable-uploads/b36875e3-2bbd-44f1-9dd7-0bd7f1f04ba7.png" 
               alt="KYA-ORA Logo" 
               className="h-8" 
             />
