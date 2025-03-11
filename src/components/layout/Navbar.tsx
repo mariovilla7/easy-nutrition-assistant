@@ -127,8 +127,12 @@ const Navbar = () => {
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-6 lg:gap-10">
           <Link to="/" className="flex items-center gap-2 font-medium">
-            <Utensils size={22} className="text-primary" />
-            <span className="text-xl">Nutritime</span>
+            <img 
+              src="/lovable-uploads/49b67077-b404-4160-98b3-498759f3855a.png" 
+              alt="KYA-ORA Logo" 
+              className="h-8" 
+            />
+            <span className="text-xl">KYA-ORA</span>
           </Link>
           
           <nav className="hidden md:flex">
@@ -219,7 +223,15 @@ const Navbar = () => {
                   </div>
                 </ScrollArea>
                 <div className="p-3 border-t">
-                  <Button variant="outline" size="sm" className="w-full" onClick={viewAllNotifications}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full" 
+                    onClick={() => {
+                      setIsNotificationOpen(false);
+                      navigate("/notifications");
+                    }}
+                  >
                     View all notifications
                   </Button>
                 </div>
@@ -239,8 +251,12 @@ const Navbar = () => {
               <SheetContent side="left" className="w-[250px] sm:w-[300px]">
                 <div className="flex flex-col h-full py-4">
                   <div className="flex items-center mb-6">
-                    <Utensils size={22} className="text-primary mr-2" />
-                    <span className="text-xl font-medium">Nutritime</span>
+                    <img 
+                      src="/lovable-uploads/49b67077-b404-4160-98b3-498759f3855a.png" 
+                      alt="KYA-ORA Logo" 
+                      className="h-6 mr-2" 
+                    />
+                    <span className="text-xl font-medium">KYA-ORA</span>
                   </div>
                   
                   <div className="px-1 mb-4">

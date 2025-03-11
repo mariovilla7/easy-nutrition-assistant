@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -34,7 +33,6 @@ import {
   Clock
 } from "lucide-react";
 
-// Sample meal plan data
 const sampleMealPlan = {
   id: "1",
   title: "Balanced Diet Plan",
@@ -108,7 +106,6 @@ const sampleMealPlan = {
   notes: "This plan is designed for individuals with moderate activity levels. Adjust portion sizes based on specific caloric needs."
 };
 
-// Sample client data
 const sampleClients = [
   { id: "1", name: "Emma Thompson", email: "emma@example.com", isAssigned: true },
   { id: "2", name: "James Wilson", email: "james@example.com", isAssigned: false },
@@ -134,14 +131,12 @@ const MealPlanDetailsPage = () => {
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Save changes
       setMealPlan(editedMealPlan);
       toast({
         title: "Changes saved",
         description: "Meal plan has been updated successfully",
       });
     } else {
-      // Start editing
       setEditedMealPlan(mealPlan);
     }
     setIsEditing(!isEditing);
@@ -167,7 +162,6 @@ const MealPlanDetailsPage = () => {
       title: "Meal plan duplicated",
       description: "A copy of this meal plan has been created",
     });
-    // In a real app, this would navigate to the new meal plan
     navigate("/meal-plans");
   };
 
@@ -506,7 +500,7 @@ const MealPlanDetailsPage = () => {
                                     Update the details for this meal
                                   </DialogDescription>
                                 </DialogHeader>
-                                <form action={handleUpdateMeal}>
+                                <form action="" onSubmit={(e) => { e.preventDefault(); handleUpdateMeal(new FormData(e.currentTarget)); }}>
                                   <input type="hidden" name="mealId" value={meal.id} />
                                   <div className="grid gap-4 py-4">
                                     <div className="grid gap-2">
@@ -630,7 +624,7 @@ const MealPlanDetailsPage = () => {
                           Send a notification to clients assigned to this meal plan
                         </DialogDescription>
                       </DialogHeader>
-                      <form action={handleScheduleNotification}>
+                      <form action="" onSubmit={(e) => { e.preventDefault(); handleScheduleNotification(new FormData(e.currentTarget)); }}>
                         <div className="grid gap-4 py-4">
                           <div className="grid gap-2">
                             <Label htmlFor="title">Title</Label>
