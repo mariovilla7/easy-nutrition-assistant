@@ -34,7 +34,7 @@ export const ClientModeProvider = ({ children }: { children: React.ReactNode }) 
 export const UserProfileDropdown = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [clientMode, setClientMode] = useState(false);
+  const { clientMode, setClientMode } = useClientMode();
   
   const handleToggleMode = () => {
     setClientMode(!clientMode);

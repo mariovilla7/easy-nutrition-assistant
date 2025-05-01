@@ -3,6 +3,10 @@ import React from 'react';
 import { useClientMode } from './navbar/UserProfileDropdown';
 import Navbar from './Navbar';
 import ClientNavbar from './ClientNavbar';
+import ClientDashboard from '@/pages/client/dashboard';
+import ClientMealPlans from '@/pages/client/meal-plans';
+import ClientAppointments from '@/pages/client/appointments';
+import ClientMessages from '@/pages/client/messages';
 
 interface ClientAppLayoutProps {
   children: React.ReactNode;
@@ -20,7 +24,9 @@ const ClientAppLayout: React.FC<ClientAppLayoutProps> = ({ children }) => {
             // Check if the child is a valid React element
             if (React.isValidElement(child)) {
               // For each child component, check if there's a client equivalent
-              const componentName = child.type.name;
+              const componentType = child.type;
+              const componentName = typeof componentType !== 'string' ? 
+                (componentType.displayName || componentType.name) : '';
               
               switch (componentName) {
                 case 'Dashboard':
