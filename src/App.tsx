@@ -51,6 +51,7 @@ const App = () => (
               <Route path="/calendar" element={<ClientAppLayout><CalendarPage /></ClientAppLayout>} />
               <Route path="/messages" element={<ClientAppLayout><MessagesPage /></ClientAppLayout>} />
               <Route path="/notifications" element={<ClientAppLayout><NotificationsPage /></ClientAppLayout>} />
+              <Route path="/profile" element={<ClientAppLayout><ClientProfilePage /></ClientAppLayout>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

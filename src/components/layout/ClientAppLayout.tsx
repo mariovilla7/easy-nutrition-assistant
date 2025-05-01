@@ -25,8 +25,16 @@ const ClientAppLayout: React.FC<ClientAppLayoutProps> = ({ children }) => {
             if (React.isValidElement(child)) {
               // For each child component, check if there's a client equivalent
               const componentType = child.type;
-              const componentName = typeof componentType !== 'string' ? 
-                (componentType.displayName || componentType.name) : '';
+              
+              // Safe extraction of component name
+              let componentName = '';
+              if (typeof componentType !== 'string') {
+                if (componentType.name) {
+                  componentName = componentType.name;
+                } else if (componentType.render && componentType.render.name) {
+                  componentName = componentType.render.name;
+                }
+              }
               
               switch (componentName) {
                 case 'Dashboard':
