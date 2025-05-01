@@ -1,6 +1,6 @@
 
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
-import { useState } from "react";
+import { useState, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -12,6 +12,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+
+// Create context for client mode
+export const ClientModeContext = createContext({
+  clientMode: false,
+  setClientMode: (value: boolean) => {}
+});
+
+export const useClientMode = () => useContext(ClientModeContext);
+
+export const ClientModeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [clientMode, setClientMode] = useState(false);
+  
+  return (
+    <ClientModeContext.Provider value={{ clientMode, setClientMode }}>
+      {children}
+    </ClientModeContext.Provider>
+  );
+};
 
 export const UserProfileDropdown = () => {
   const navigate = useNavigate();
