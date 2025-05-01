@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import AnimatedTransition from "../layout/AnimatedTransition";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 
 // Mock data for demonstration
 const clients = [
@@ -117,6 +118,11 @@ const ClientList = ({ className }: ClientListProps) => {
                         />
                       </div>
                     </div>
+                    <Switch 
+                      checked={client.status === "active"} 
+                      aria-label={`Toggle ${client.name}'s status`}
+                      onClick={(e) => e.stopPropagation()}
+                    />
                     <ChevronRight size={16} className="text-muted-foreground" />
                   </div>
                 </div>

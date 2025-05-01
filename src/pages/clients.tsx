@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import CreateClientDialog from "@/components/clients/CreateClientDialog";
+import { Switch } from "@/components/ui/switch";
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -24,7 +25,8 @@ const ClientsPage = () => {
       joinDate: "Jan 2023",
       age: 26,
       goal: "Weight Loss",
-      plan: "Weight Loss Plan"
+      plan: "Weight Loss Plan",
+      status: "active"
     },
     {
       id: 2,
@@ -33,7 +35,8 @@ const ClientsPage = () => {
       joinDate: "Mar 2023",
       age: 32,
       goal: "Muscle Gain",
-      plan: "Muscle Gain Plan"
+      plan: "Muscle Gain Plan",
+      status: "active"
     },
     {
       id: 3,
@@ -42,7 +45,8 @@ const ClientsPage = () => {
       joinDate: "Nov 2022",
       age: 29,
       goal: "Balanced Diet",
-      plan: "Balanced Diet Plan"
+      plan: "Balanced Diet Plan",
+      status: "active"
     },
     {
       id: 4,
@@ -51,7 +55,8 @@ const ClientsPage = () => {
       joinDate: "Feb 2023",
       age: 45,
       goal: "Weight Loss",
-      plan: "Weight Loss Plan"
+      plan: "Weight Loss Plan",
+      status: "inactive"
     },
     {
       id: 5,
@@ -60,7 +65,8 @@ const ClientsPage = () => {
       joinDate: "Apr 2023",
       age: 38,
       goal: "Muscle Gain",
-      plan: "Muscle Gain Plan"
+      plan: "Muscle Gain Plan",
+      status: "active"
     },
     {
       id: 6,
@@ -69,7 +75,8 @@ const ClientsPage = () => {
       joinDate: "Dec 2022",
       age: 41,
       goal: "Balanced Diet",
-      plan: "Balanced Diet Plan"
+      plan: "Balanced Diet Plan",
+      status: "inactive"
     }
   ]);
 
@@ -88,6 +95,24 @@ const ClientsPage = () => {
     navigate(`/meal-plans/new/assign?clientId=${id}`);
     toast({
       description: "Choose a meal plan to assign...",
+    });
+  };
+
+  const handleToggleStatus = (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const updatedClients = clients.map(client => 
+      client.id === id ? { ...client, status: client.status === "active" ? "inactive" : "active" } : client
+    );
+    
+    setClients(updatedClients);
+    
+    const client = clients.find(c => c.id === id);
+    const newStatus = client?.status === "active" ? "inactive" : "active";
+    
+    toast({
+      description: `${client?.name} set to ${newStatus}`,
     });
   };
 
@@ -135,20 +160,34 @@ const ClientsPage = () => {
             {filteredClients.map((client) => (
               <Card key={client.id}>
                 <CardHeader className="pb-2">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={`https://i.pravatar.cc/100?img=${client.id}`} />
-                      <AvatarFallback>
-                        {client.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-base">
-                        {client.name}
-                      </CardTitle>
-                      <p className="text-xs text-muted-foreground">
-                        Client since {client.joinDate}
-                      </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={`https://i.pravatar.cc/100?img=${client.id}`} />
+                        <AvatarFallback>
+                          {client.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <CardTitle className="text-base">
+                          {client.name}
+                        </CardTitle>
+                        <p className="text-xs text-muted-foreground">
+                          Client since {client.joinDate}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-xs mr-2 text-muted-foreground">
+                        {client.status === "active" ? "Active" : "Inactive"}
+                      </span>
+                      <Switch 
+                        checked={client.status === "active"}
+                        onCheckedChange={(checked) => {
+                          handleToggleStatus(client.id, { preventDefault: () => {}, stopPropagation: () => {} } as React.MouseEvent);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
                     </div>
                   </div>
                 </CardHeader>
