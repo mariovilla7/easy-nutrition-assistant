@@ -1,5 +1,6 @@
 
-import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { ChevronDown, LogOut, Settings, User } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -9,9 +10,20 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 export const UserProfileDropdown = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [clientMode, setClientMode] = useState(false);
+  
+  const handleToggleMode = () => {
+    setClientMode(!clientMode);
+    toast({
+      description: `Switched to ${!clientMode ? 'Client' : 'Professional'} view`,
+    });
+  };
   
   return (
     <DropdownMenu>
@@ -24,10 +36,22 @@ export const UserProfileDropdown = () => {
           <ChevronDown size={16} className="text-muted-foreground" />
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-60">
         <div className="px-2 py-1.5">
           <p className="text-sm font-medium leading-none">Jane Doe</p>
           <p className="text-xs text-muted-foreground">jane@example.com</p>
+        </div>
+        <DropdownMenuSeparator />
+        <div className="px-2 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <User size={16} />
+            <span className="text-sm">Client Mode</span>
+          </div>
+          <Switch 
+            checked={clientMode}
+            onCheckedChange={handleToggleMode}
+            aria-label="Toggle client mode"
+          />
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/settings")}>
